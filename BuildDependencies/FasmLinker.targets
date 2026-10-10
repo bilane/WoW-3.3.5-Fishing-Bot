@@ -1,0 +1,7 @@
+<Project>
+  <ItemDefinitionGroup>
+    <Link>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+  </ItemDefinitionGroup>
+</Project>

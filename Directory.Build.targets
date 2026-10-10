@@ -15,7 +15,7 @@
           DestinationFiles="$(MSBuildThisFileDirectory)GreyMagic\fasmdll_managed\FASM.OBJ" />
     <MSBuild Projects="$(MSBuildThisFileDirectory)GreyMagic\fasmdll_managed\fasmdll_managed.vcxproj"
              Targets="Build"
-             Properties="Configuration=$(Configuration);Platform=Win32" />
+             Properties="Configuration=$(Configuration);Platform=Win32;ForceImportAfterCppTargets=$(MSBuildThisFileDirectory)BuildDependencies\FasmLinker.targets" />
     <ItemGroup>
       <Reference Include="fasmdll_managed">
         <HintPath>$(MSBuildThisFileDirectory)GreyMagic\fasmdll_managed\bin\$(Configuration)\fasmdll_managed.dll</HintPath>
