@@ -10,4 +10,15 @@
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'GreyMagic'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <Target Name="BuildFasmManagedDependency" BeforeTargets="ResolveReferences" Condition="'$(MSBuildProjectName)' == 'GreyMagic'">
+    <MSBuild Projects="$(MSBuildThisFileDirectory)GreyMagic\fasmdll_managed\fasmdll_managed.vcxproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration);Platform=Win32" />
+    <ItemGroup>
+      <Reference Include="fasmdll_managed">
+        <HintPath>$(MSBuildThisFileDirectory)GreyMagic\fasmdll_managed\bin\$(Configuration)\fasmdll_managed.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
+    </ItemGroup>
+  </Target>
 </Project>
