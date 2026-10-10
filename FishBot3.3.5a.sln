@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FishBot3.3.5a", "FishBot3.3.5a\FishBot3.3.5a.csproj", "{243F9CD0-30D6-4393-A0DC-CCC80B781F07}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GreyMagic", "GreyMagic\GreyMagic\GreyMagic.csproj", "{29BEE34E-8D6A-47BF-96FA-ABA46F6E9B66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4756CF18-2091-446F-A79D-9E521611DEB5} = {4756CF18-2091-446F-A79D-9E521611DEB5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fasmdll_managed", "GreyMagic\fasmdll_managed\fasmdll_managed.vcxproj", "{4756CF18-2091-446F-A79D-9E521611DEB5}"
 EndProject
