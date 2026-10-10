@@ -1,7 +1,13 @@
 <Project>
+  <PropertyGroup>
+    <LinkKeyFile />
+    <LinkDelaySign>false</LinkDelaySign>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <KeyFile />
+      <DelaySign>false</DelaySign>
     </Link>
   </ItemDefinitionGroup>
 </Project>
