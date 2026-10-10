@@ -44,6 +44,16 @@ jobs:
       - name: Restore NuGet packages
         run: nuget restore FishBot3.3.5a.sln
 
+      - name: Build Fasm C++/CLI dependency first
+        shell: pwsh
+        run: |
+          $project = "GreyMagic\fasmdll_managed\fasmdll_managed.vcxproj"
+          if (-not (Test-Path $project)) { throw "Fasm project was not checked out: $project" }
+          msbuild $project /m /p:Configuration=Release /p:Platform=Win32 /verbosity:minimal
+          if ($LASTEXITCODE -ne 0) { throw "Fasm C++/CLI dependency build failed with exit code $LASTEXITCODE." }
+          $dll = "GreyMagic\fasmdll_managed\bin\Release\fasmdll_managed.dll"
+          if (-not (Test-Path $dll)) { throw "Fasm dependency build did not produce $dll" }
+
       - name: Build Release x86
         shell: pwsh
         run: |
