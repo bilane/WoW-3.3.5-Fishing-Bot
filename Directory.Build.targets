@@ -10,17 +10,17 @@
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'GreyMagic'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <Target Name="BuildFasmManagedDependency" BeforeTargets="ResolveReferences" Condition="'$(MSBuildProjectName)' == 'GreyMagic'">
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'GreyMagic'">
+    <Reference Include="fasmdll_managed">
+      <HintPath>$(MSBuildThisFileDirectory)GreyMagic\fasmdll_managed\bin\$(Configuration)\fasmdll_managed.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="BuildFasmManagedDependency" BeforeTargets="ResolveAssemblyReferences" Condition="'$(MSBuildProjectName)' == 'GreyMagic'">
     <Copy SourceFiles="$(MSBuildThisFileDirectory)BuildDependencies\FASM.OBJ"
           DestinationFiles="$(MSBuildThisFileDirectory)GreyMagic\fasmdll_managed\FASM.OBJ" />
     <MSBuild Projects="$(MSBuildThisFileDirectory)GreyMagic\fasmdll_managed\fasmdll_managed.vcxproj"
              Targets="Build"
              Properties="Configuration=$(Configuration);ConfigurationName=$(Configuration);Platform=Win32;ForceImportAfterCppTargets=$(MSBuildThisFileDirectory)BuildDependencies\FasmLinker.targets" />
-    <ItemGroup>
-      <Reference Include="fasmdll_managed">
-        <HintPath>$(MSBuildThisFileDirectory)GreyMagic\fasmdll_managed\bin\$(Configuration)\fasmdll_managed.dll</HintPath>
-        <Private>True</Private>
-      </Reference>
-    </ItemGroup>
   </Target>
 </Project>
