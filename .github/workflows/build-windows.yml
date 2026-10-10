@@ -1,0 +1,71 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - bilane-fishing-bot-readiness
+    paths:
+      - 'FishBot3.3.5a/**'
+      - 'GreyMagic'
+      - 'FishBot3.3.5a.sln'
+      - 'Directory.Build.targets'
+      - '.github/workflows/build-windows.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - name: Check out repository and submodules
+        uses: actions/checkout@v4
+        with:
+          ref: bilane-fishing-bot-readiness
+          submodules: recursive
+
+      - name: Install required Visual C++ build components
+        shell: pwsh
+        run: |
+          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -property installationPath
+          if (-not $vsPath) { throw "Visual Studio installation was not found on the runner." }
+          $installer = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe"
+          if (-not (Test-Path $installer)) { throw "Visual Studio Installer was not found at $installer" }
+          & $installer modify --installPath "$vsPath" --add Microsoft.VisualStudio.Component.VC.v142.x86.x64 --add Microsoft.VisualStudio.Component.VC.CLI.Support --quiet --norestart --wait
+          if ($LASTEXITCODE -ne 0) { throw "Could not install required C++ build components (exit $LASTEXITCODE)." }
+
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Set up NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore FishBot3.3.5a.sln
+
+      - name: Build Release x86
+        shell: pwsh
+        run: |
+          msbuild FishBot3.3.5a.sln /m /p:Configuration=Release /p:Platform="Any CPU" /p:RestorePackagesConfig=true /verbosity:minimal
+          if ($LASTEXITCODE -ne 0) { throw "MSBuild failed with exit code $LASTEXITCODE." }
+          $exe = "FishBot3.3.5a\bin\Release\FishBot3.3.5a.exe"
+          if (-not (Test-Path $exe)) { throw "Build finished without producing $exe" }
+
+      - name: Package Release output
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+          Copy-Item "FishBot3.3.5a\bin\Release\*" "artifacts\" -Recurse -Force
+          Compress-Archive -Path "artifacts\*" -DestinationPath "FishBot3.3.5a-Release-x86.zip" -Force
+          Copy-Item "FishBot3.3.5a\bin\Release\FishBot3.3.5a.exe" "FishBot3.3.5a.exe" -Force
+
+      - name: Upload downloadable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: FishBot3.3.5a-Release-x86
+          path: |
+            FishBot3.3.5a-Release-x86.zip
+            FishBot3.3.5a.exe
+          if-no-files-found: error
+          retention-days: 14
