@@ -13,7 +13,7 @@ This project is written wholly in C#, using the [GrayMagic and FASM packages](ht
 
 On Windows 11, install Visual Studio with the **.NET desktop development** and **Desktop development with C++** workloads, including **C++/CLI support**. The C++ project uses the **MSVC v142 - VS 2019 C++ x64/x86 build tools** component; install it from Visual Studio Installer's **Individual components** tab if using Visual Studio 2022. The .NET Framework 4.0 and 4.7.2 reference assemblies are restored as NuGet dependencies, so separate Developer Packs are not needed.
 
-The [GreyMagic dependency](https://github.com/benjamin-t-wilson/GreyMagic) is pinned as a submodule in this repository. After cloning this repository, open **Developer PowerShell for Visual Studio**, change to the repository folder, and run:
+The [GreyMagic dependency](https://github.com/benjamin-t-wilson/GreyMagic) is pinned as a submodule in this repository. The FASM object required by its native C++/CLI wrapper is included under `BuildDependencies` with its license; the build copies it to the dependency project before linking. After cloning this repository, open **Developer PowerShell for Visual Studio**, change to the repository folder, and run:
 
 ```powershell
 git submodule update --init --recursive
