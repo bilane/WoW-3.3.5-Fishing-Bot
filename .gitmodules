@@ -1,0 +1,3 @@
+[submodule "GreyMagic"]
+	path = GreyMagic
+	url = https://github.com/benjamin-t-wilson/GreyMagic.git

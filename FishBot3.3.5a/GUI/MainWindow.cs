@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -15,14 +16,26 @@ namespace FishBot3._3._5a
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public partial class MainWindow : Form
     {
+        private const int WmHotKey = 0x0312;
+        private const uint ModControl = 0x0002;
+        private const uint ModNoRepeat = 0x4000;
+        private const int StartFishingHotKeyId = 1;
+        private const int StopFishingHotKeyId = 2;
+        private const int CaptureLocationHotKeyId = 3;
+        private const int ClickLocationHotKeyId = 4;
+        private const uint MouseEventLeftDown = 0x0002;
+        private const uint MouseEventLeftUp = 0x0004;
+
         private static Lua lua;
 
         public static List<ulong> lastBobberGuid;
         private int Caught;
         private IntPtr FirstObj;
         private bool Fish;
-        private IntPtr playerbase;
         private Hook wowHook;
+        private Process wowProcess;
+        private Point? lootBindClickLocation;
+        private bool captureLootBindClickLocation;
 
         public MainWindow()
         {
@@ -65,6 +78,7 @@ namespace FishBot3._3._5a
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            cmdFish.Enabled = false;
             toolStripStatusLabel1.Text = string.Format(toolStripStatusLabel1.Text, Exe_Version);
             toolStripStatusLabel3.Text = string.Format(toolStripStatusLabel3.Text, LocalVersion);
 
@@ -72,6 +86,7 @@ namespace FishBot3._3._5a
             FormClosing += MainWindow_FormClosing;
 
             Log.Initialize(LogTextBox, this);
+            RegisterHotKeys();
         }
 
         private void MainWindow_Shown(object sender = null, EventArgs e = null)
@@ -83,26 +98,29 @@ namespace FishBot3._3._5a
             {
                 Log.Write("Attempting to connect to running WoW.exe process...", Color.Black);
 
-                var proc = Process.GetProcessesByName("WoW").FirstOrDefault();
-
-                if (proc == null)
+                while ((wowProcess = Process.GetProcessesByName("WoW").FirstOrDefault()) == null)
                 {
-                    var res = MessageBox.Show("Please open WoW, and login, and select your character before using the bot.", "FishBot", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+                    var result = MessageBox.Show(
+                        "Open the 32-bit WoW 3.3.5a client, log in, and select a character before using the bot. Retry?",
+                        "FishBot", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
 
-                    if (res == DialogResult.Cancel)
+                    if (result != DialogResult.Yes)
                     {
                         Application.Exit();
                         return;
                     }
-
-                    proc = Process.GetProcessesByName("WoW").FirstOrDefault();
                 }
 
-                wowHook = new Hook(proc);
+                if (Utility.Is64BitProcess(wowProcess))
+                    throw new InvalidOperationException("This bot supports only the 32-bit WoW 3.3.5a client.");
+
+                wowHook = new Hook(wowProcess);
                 wowHook.InstallHook();
+                if (!wowHook.Installed)
+                    throw new InvalidOperationException("Could not install the game hook. Check the log and confirm the client is running as the same Windows user.");
                 lua = new Lua(wowHook);
 
-                Log.Write("Connected to process with ID = " + proc.Id, Color.Black);
+                Log.Write("Connected to process with ID = " + wowProcess.Id, Color.Black);
 
                 textBox1.Text = wowHook.Memory.ReadString(Offsets.PlayerName, Encoding.UTF8);
 
@@ -115,13 +133,8 @@ namespace FishBot3._3._5a
                 // Thread.Sleep(100);
                 Log.Write("Zone: " + lua.GetLocalizedText("zoneData"), Color.Black);
 
-                var PlayerBase = new IntPtr(0x00CD87A8);
-
-                playerbase = wowHook.Memory.Read<IntPtr>(
-                    wowHook.Memory.Read<IntPtr>(
-                        wowHook.Memory.Read<IntPtr>(PlayerBase) + 0x34) + 0x24);
-
                 Log.Write("Click 'Fish' to begin fishing.", Color.Green);
+                cmdFish.Enabled = true;
             }
             catch (Exception ex)
             {
@@ -131,11 +144,147 @@ namespace FishBot3._3._5a
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
+            NativeMethods.UnregisterHotKey(Handle, StartFishingHotKeyId);
+            NativeMethods.UnregisterHotKey(Handle, StopFishingHotKeyId);
+            NativeMethods.UnregisterHotKey(Handle, CaptureLocationHotKeyId);
+            NativeMethods.UnregisterHotKey(Handle, ClickLocationHotKeyId);
             wowHook?.DisposeHooking();
+        }
+
+        protected override void WndProc(ref Message message)
+        {
+            if (message.Msg == WmHotKey)
+            {
+                switch (message.WParam.ToInt32())
+                {
+                    case StartFishingHotKeyId:
+                        if (cmdFish.Enabled)
+                            cmdFish.PerformClick();
+                        break;
+                    case StopFishingHotKeyId:
+                        if (cmdStop.Enabled)
+                            cmdStop.PerformClick();
+                        break;
+                    case CaptureLocationHotKeyId:
+                        CaptureLootBindClickLocation();
+                        break;
+                    case ClickLocationHotKeyId:
+                        ClickLootBindLocation();
+                        break;
+                }
+
+                return;
+            }
+
+            base.WndProc(ref message);
+        }
+
+        private void RegisterHotKeys()
+        {
+            RegisterHotKey(StartFishingHotKeyId, Keys.F6);
+            RegisterHotKey(StopFishingHotKeyId, Keys.F7);
+            RegisterHotKey(CaptureLocationHotKeyId, Keys.F8);
+            RegisterHotKey(ClickLocationHotKeyId, Keys.F9);
+        }
+
+        private void RegisterHotKey(int id, Keys key)
+        {
+            if (!NativeMethods.RegisterHotKey(Handle, id, ModControl | ModNoRepeat, (uint)key))
+                Log.Write("Could not register Ctrl+" + key + ": " +
+                          new Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error()).Message, Color.Red);
+        }
+
+        private void pickLootBindLocationButton_Click(object sender, EventArgs e)
+        {
+            if (!autoAcceptLootBindCheckBox.Checked)
+            {
+                Log.Write("Enable bind-popup auto-accept before setting a fallback click location.", Color.DarkOrange);
+                return;
+            }
+
+            captureLootBindClickLocation = true;
+            hotkeyHelpLabel.Text = "Show popup, point at Accept, then press Ctrl+F8";
+            Log.Write("Show the bind confirmation and point at its Accept button. Press Ctrl+F8 to save its screen position.", Color.Black);
+        }
+
+        private void CaptureLootBindClickLocation()
+        {
+            if (!captureLootBindClickLocation)
+                return;
+
+            if (wowProcess == null || NativeMethods.GetForegroundWindow() != wowProcess.MainWindowHandle)
+            {
+                Log.Write("Bring the WoW client and bind confirmation to the foreground before capturing the button location.", Color.DarkOrange);
+                return;
+            }
+
+            if (!NativeMethods.GetCursorPos(out var position))
+            {
+                Log.Write("Could not capture the cursor position: " +
+                          new Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error()).Message, Color.Red);
+                return;
+            }
+
+            lootBindClickLocation = new Point(position.X, position.Y);
+            captureLootBindClickLocation = false;
+            hotkeyHelpLabel.Text = string.Format("Fallback point saved: {0}, {1}", position.X, position.Y);
+            Log.Write(hotkeyHelpLabel.Text, Color.Green);
+        }
+
+        private void ClickLootBindLocation()
+        {
+            if (!autoAcceptLootBindCheckBox.Checked || !Fish)
+                return;
+
+            if (lootBindClickLocation == null)
+            {
+                Log.Write("Set a fallback click location before using Ctrl+F9.", Color.DarkOrange);
+                return;
+            }
+
+            if (wowProcess == null || NativeMethods.GetForegroundWindow() != wowProcess.MainWindowHandle)
+            {
+                Log.Write("Fallback click skipped: bring the WoW client to the foreground first.", Color.DarkOrange);
+                return;
+            }
+
+            if (!NativeMethods.GetCursorPos(out var originalPosition))
+            {
+                Log.Write("Could not read the cursor position: " +
+                          new Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error()).Message, Color.Red);
+                return;
+            }
+
+            var clickLocation = lootBindClickLocation.Value;
+            if (!NativeMethods.SetCursorPos(clickLocation.X, clickLocation.Y))
+            {
+                Log.Write("Could not move the cursor to the saved popup location: " +
+                          new Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error()).Message, Color.Red);
+                return;
+            }
+
+            try
+            {
+                NativeMethods.mouse_event(MouseEventLeftDown, 0, 0, 0, UIntPtr.Zero);
+                NativeMethods.mouse_event(MouseEventLeftUp, 0, 0, 0, UIntPtr.Zero);
+                Log.Write("Clicked the saved popup location. Use Ctrl+F9 only when the bind confirmation is visible.", Color.Black);
+            }
+            finally
+            {
+                if (!NativeMethods.SetCursorPos(originalPosition.X, originalPosition.Y))
+                    Log.Write("Could not restore the mouse cursor position: " +
+                              new Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error()).Message, Color.Red);
+            }
         }
 
         private void cmdFish_Click(object sender, EventArgs e)
         {
+            if (wowHook == null || !wowHook.Installed)
+            {
+                Log.Write("Connect to a supported WoW client before starting.", Color.Red);
+                return;
+            }
+
             lastBobberGuid = new List<ulong>();
 
             cmdStop.Enabled = true;
@@ -148,6 +297,9 @@ namespace FishBot3._3._5a
                 try
                 {
                     Application.DoEvents();
+
+                    if (autoAcceptLootBindCheckBox.Checked)
+                        lua.AcceptPendingLootBinding();
 
                     if (GetInventorySlotsLeft == 0)
                     {

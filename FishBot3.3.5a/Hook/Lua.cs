@@ -85,5 +85,18 @@ namespace FishBot3._3._5a
 
             DoString(string.Format("CastSpellByName('{0}')", spell));
         }
+
+        public void AcceptPendingLootBinding()
+        {
+            DoString(
+                "for index = 1, STATICPOPUP_NUMDIALOGS do " +
+                "local popup = _G['StaticPopup' .. index]; " +
+                "if popup and popup:IsShown() and popup.which == 'LOOT_BIND' then " +
+                "local acceptButton = _G[popup:GetName() .. 'Button1']; " +
+                "if acceptButton and acceptButton:IsEnabled() == 1 then acceptButton:Click() end; " +
+                "break; " +
+                "end " +
+                "end");
+        }
     }
 }

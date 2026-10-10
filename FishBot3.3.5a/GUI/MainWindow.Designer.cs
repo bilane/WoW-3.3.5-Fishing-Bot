@@ -38,6 +38,9 @@ namespace FishBot3._3._5a
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.cmdStop = new System.Windows.Forms.Button();
+            this.autoAcceptLootBindCheckBox = new System.Windows.Forms.CheckBox();
+            this.pickLootBindLocationButton = new System.Windows.Forms.Button();
+            this.hotkeyHelpLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -52,9 +55,9 @@ namespace FishBot3._3._5a
             this.dropItemsLabel = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // LogTextBox
-            // 
+            //
             this.LogTextBox.Location = new System.Drawing.Point(10, 44);
             this.LogTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.LogTextBox.Name = "LogTextBox";
@@ -103,6 +106,36 @@ namespace FishBot3._3._5a
             this.cmdStop.Text = "Stop Fishing";
             this.cmdStop.UseVisualStyleBackColor = true;
             this.cmdStop.Click += new System.EventHandler(this.cmdStop_Click);
+            //
+            // autoAcceptLootBindCheckBox
+            //
+            this.autoAcceptLootBindCheckBox.AutoSize = true;
+            this.autoAcceptLootBindCheckBox.Location = new System.Drawing.Point(506, 12);
+            this.autoAcceptLootBindCheckBox.Name = "autoAcceptLootBindCheckBox";
+            this.autoAcceptLootBindCheckBox.Size = new System.Drawing.Size(341, 21);
+            this.autoAcceptLootBindCheckBox.TabIndex = 27;
+            this.autoAcceptLootBindCheckBox.Text = "Auto-accept bind-on-pickup (items become soulbound)";
+            this.autoAcceptLootBindCheckBox.UseVisualStyleBackColor = true;
+            //
+            // pickLootBindLocationButton
+            //
+            this.pickLootBindLocationButton.Location = new System.Drawing.Point(506, 38);
+            this.pickLootBindLocationButton.Name = "pickLootBindLocationButton";
+            this.pickLootBindLocationButton.Size = new System.Drawing.Size(180, 25);
+            this.pickLootBindLocationButton.TabIndex = 28;
+            this.pickLootBindLocationButton.Text = "Set fallback click location";
+            this.pickLootBindLocationButton.UseVisualStyleBackColor = true;
+            this.pickLootBindLocationButton.Click += new System.EventHandler(this.pickLootBindLocationButton_Click);
+            //
+            // hotkeyHelpLabel
+            //
+            this.hotkeyHelpLabel.AutoSize = false;
+            this.hotkeyHelpLabel.Location = new System.Drawing.Point(691, 43);
+            this.hotkeyHelpLabel.Name = "hotkeyHelpLabel";
+            this.hotkeyHelpLabel.Size = new System.Drawing.Size(255, 30);
+            this.hotkeyHelpLabel.TabIndex = 29;
+            this.hotkeyHelpLabel.Text = "Ctrl+F6 Start | Ctrl+F7 Stop | Ctrl+F8 Pick | Ctrl+F9 Click";
+            this.hotkeyHelpLabel.UseMnemonic = false;
             // 
             // label2
             // 
@@ -365,18 +398,18 @@ namespace FishBot3._3._5a
             "Winter Squid",
             "World\'s Largest Mudfish",
             "Zangarian Sporefish"});
-            this.keptItems.Location = new System.Drawing.Point(519, 74);
+            this.keptItems.Location = new System.Drawing.Point(519, 96);
             this.keptItems.Name = "keptItems";
-            this.keptItems.Size = new System.Drawing.Size(170, 452);
+            this.keptItems.Size = new System.Drawing.Size(170, 430);
             this.keptItems.TabIndex = 0;
             this.keptItems.SelectedIndexChanged += new System.EventHandler(this.keptItems_SelectedIndexChanged);
             // 
             // dropItems
             // 
             this.dropItems.ItemHeight = 16;
-            this.dropItems.Location = new System.Drawing.Point(775, 74);
+            this.dropItems.Location = new System.Drawing.Point(775, 96);
             this.dropItems.Name = "dropItems";
-            this.dropItems.Size = new System.Drawing.Size(170, 452);
+            this.dropItems.Size = new System.Drawing.Size(170, 430);
             this.dropItems.TabIndex = 0;
             // 
             // keptToDropButton
@@ -399,7 +432,7 @@ namespace FishBot3._3._5a
             // 
             // keptItemsLabel
             // 
-            this.keptItemsLabel.Location = new System.Drawing.Point(560, 51);
+            this.keptItemsLabel.Location = new System.Drawing.Point(560, 73);
             this.keptItemsLabel.Name = "keptItemsLabel";
             this.keptItemsLabel.Size = new System.Drawing.Size(74, 17);
             this.keptItemsLabel.TabIndex = 3;
@@ -407,7 +440,7 @@ namespace FishBot3._3._5a
             // 
             // dropItemsLabel
             // 
-            this.dropItemsLabel.Location = new System.Drawing.Point(813, 51);
+            this.dropItemsLabel.Location = new System.Drawing.Point(813, 73);
             this.dropItemsLabel.Name = "dropItemsLabel";
             this.dropItemsLabel.Size = new System.Drawing.Size(100, 23);
             this.dropItemsLabel.TabIndex = 26;
@@ -422,6 +455,9 @@ namespace FishBot3._3._5a
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.cmdStop);
+            this.Controls.Add(this.autoAcceptLootBindCheckBox);
+            this.Controls.Add(this.pickLootBindLocationButton);
+            this.Controls.Add(this.hotkeyHelpLabel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.cmdFish);
@@ -452,6 +488,9 @@ namespace FishBot3._3._5a
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button cmdStop;
+        private System.Windows.Forms.CheckBox autoAcceptLootBindCheckBox;
+        private System.Windows.Forms.Button pickLootBindLocationButton;
+        private System.Windows.Forms.Label hotkeyHelpLabel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.StatusStrip statusStrip1;
@@ -466,4 +505,3 @@ namespace FishBot3._3._5a
         public System.Windows.Forms.Label dropItemsLabel;
     }
 }
-

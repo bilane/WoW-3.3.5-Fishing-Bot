@@ -15,7 +15,9 @@ Copyright 2012 HighVoltz
 */
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace FishBot3._3._5a
 {
@@ -25,9 +27,13 @@ namespace FishBot3._3._5a
 
         public static bool Is64BitProcess(Process proc)
         {
-            bool retVal;
-            return Environment.Is64BitOperatingSystem &&
-                   !(NativeMethods.IsWow64Process(proc.Handle, out retVal) && retVal);
+            if (!Environment.Is64BitOperatingSystem)
+                return false;
+
+            if (!NativeMethods.IsWow64Process(proc.Handle, out var isWow64))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+
+            return !isWow64;
         }
     }
 }

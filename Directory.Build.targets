@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
+    <TargetFrameworkRootPath>$(MSBuildThisFileDirectory)packages\Microsoft.NETFramework.ReferenceAssemblies.net40.1.0.3\build\</TargetFrameworkRootPath>
+    <FrameworkPathOverride>$(MSBuildThisFileDirectory)packages\Microsoft.NETFramework.ReferenceAssemblies.net40.1.0.3\build\.NETFramework\v4.0</FrameworkPathOverride>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFrameworkVersion)' == 'v4.7.2'">
+    <TargetFrameworkRootPath>$(MSBuildThisFileDirectory)packages\Microsoft.NETFramework.ReferenceAssemblies.net472.1.0.3\build\</TargetFrameworkRootPath>
+    <FrameworkPathOverride>$(MSBuildThisFileDirectory)packages\Microsoft.NETFramework.ReferenceAssemblies.net472.1.0.3\build\.NETFramework\v4.7.2</FrameworkPathOverride>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'GreyMagic'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+</Project>

@@ -9,11 +9,29 @@ Botting is against Blizzard terms and conditions, and will result in your accoun
 
 This project is written wholly in C#, using the [GrayMagic and FASM packages](https://github.com/benjamin-t-wilson/GreyMagic).
 
+### Building from source --
+
+On Windows 11, install Visual Studio with the **.NET desktop development** and **Desktop development with C++** workloads, including **C++/CLI support**. The C++ project uses the **MSVC v142 - VS 2019 C++ x64/x86 build tools** component; install it from Visual Studio Installer's **Individual components** tab if using Visual Studio 2022. The .NET Framework 4.0 and 4.7.2 reference assemblies are restored as NuGet dependencies, so separate Developer Packs are not needed.
+
+The [GreyMagic dependency](https://github.com/benjamin-t-wilson/GreyMagic) is pinned as a submodule in this repository. After cloning this repository, open **Developer PowerShell for Visual Studio**, change to the repository folder, and run:
+
+```powershell
+git submodule update --init --recursive
+nuget restore FishBot3.3.5a.sln
+msbuild FishBot3.3.5a.sln /m /p:Configuration=Release /p:Platform="Any CPU"
+```
+
+For a fresh clone, use `git clone --recurse-submodules` instead of the separate submodule update command. The executable is produced at `FishBot3.3.5a\bin\Release\FishBot3.3.5a.exe`. Both configurations target x86. The application requests administrator privileges at launch and requires a 32-bit WoW 3.3.5a client; the client executable's memory layout must match the offsets in the source. A successful build does not verify compatibility with a particular game client.
+
 ### Launch --
 
-In the _WoW-3.3.5-Fishing-Bot\FishBot3.3.5a\bin\Debug_ folder there is an executable file. After opening WoW and logging into your account / character, open this exe as administrator. It will not work without administrator privileges due to the nature of this application's function.
+After a successful Release build, run `FishBot3.3.5a\bin\Release\FishBot3.3.5a.exe` after starting WoW and logging into your character; Windows will display a UAC prompt because the application needs administrator privileges. Do not use the checked-in Debug executable as the updated build.
 
 The application intercepts memory created / used by the WoW.exe system process in order to interact directly with the game engine. In addition to requiring admin perms to accomplish, this means it does not hijack the use of your mouse, keyboard, or active window.
+
+During fishing, enable **Auto-accept bind-on-pickup** to accept only the client's `LOOT_BIND` confirmation. This permanently binds that item to the character. If a modified client uses a popup the automatic check cannot recognize, enable the option, click **Set fallback click location**, display the bind popup, move the pointer over its Accept button, and press **Ctrl+F8** to save the screen position. While fishing with WoW in the foreground, press **Ctrl+F9** when that popup is visible to click the saved position; this fallback is deliberately manual so it never blindly clicks unrelated UI. The cursor is restored after the click, and the location is remembered only until the bot closes.
+
+Global hotkeys are **Ctrl+F6** to start fishing, **Ctrl+F7** to stop, **Ctrl+F8** to capture the fallback position after selecting it, and **Ctrl+F9** to click that position. If another application has already registered a shortcut, the bot logs that it could not register it.
 
 ### Future Features to Implement
 
