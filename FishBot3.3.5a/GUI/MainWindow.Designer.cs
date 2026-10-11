@@ -42,6 +42,10 @@ namespace FishBot3._3._5a
             this.pickLootBindLocationButton = new System.Windows.Forms.Button();
             this.hotkeyHelpLabel = new System.Windows.Forms.Label();
             this.preventAfkDisconnectCheckBox = new System.Windows.Forms.CheckBox();
+            this.afkForwardKeyLabel = new System.Windows.Forms.Label();
+            this.preventAfkForwardKeyComboBox = new System.Windows.Forms.ComboBox();
+            this.afkBackwardKeyLabel = new System.Windows.Forms.Label();
+            this.preventAfkBackwardKeyComboBox = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -145,10 +149,68 @@ namespace FishBot3._3._5a
             this.preventAfkDisconnectCheckBox.Name = "preventAfkDisconnectCheckBox";
             this.preventAfkDisconnectCheckBox.Size = new System.Drawing.Size(440, 21);
             this.preventAfkDisconnectCheckBox.TabIndex = 30;
-            this.preventAfkDisconnectCheckBox.Text = "Prevent AFK (brief W then S every 2 min; WoW must be in foreground)";
+            this.preventAfkDisconnectCheckBox.Text = "Prevent AFK (brief movement every 2 min; WoW must be in foreground)";
             this.preventAfkDisconnectCheckBox.UseVisualStyleBackColor = true;
             this.preventAfkDisconnectCheckBox.CheckedChanged += new System.EventHandler(this.preventAfkDisconnectCheckBox_CheckedChanged);
             // 
+            // afkForwardKeyLabel
+            //
+            this.afkForwardKeyLabel.AutoSize = true;
+            this.afkForwardKeyLabel.Location = new System.Drawing.Point(506, 99);
+            this.afkForwardKeyLabel.Name = "afkForwardKeyLabel";
+            this.afkForwardKeyLabel.Size = new System.Drawing.Size(56, 17);
+            this.afkForwardKeyLabel.TabIndex = 31;
+            this.afkForwardKeyLabel.Text = "Forward:";
+            //
+            // preventAfkForwardKeyComboBox
+            //
+            this.preventAfkForwardKeyComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.preventAfkForwardKeyComboBox.FormattingEnabled = true;
+            this.preventAfkForwardKeyComboBox.Items.AddRange(new object[] {
+            System.Windows.Forms.Keys.W,
+            System.Windows.Forms.Keys.A,
+            System.Windows.Forms.Keys.S,
+            System.Windows.Forms.Keys.D,
+            System.Windows.Forms.Keys.Z,
+            System.Windows.Forms.Keys.Q,
+            System.Windows.Forms.Keys.Up,
+            System.Windows.Forms.Keys.Down});
+            this.preventAfkForwardKeyComboBox.Location = new System.Drawing.Point(570, 95);
+            this.preventAfkForwardKeyComboBox.Name = "preventAfkForwardKeyComboBox";
+            this.preventAfkForwardKeyComboBox.Size = new System.Drawing.Size(70, 24);
+            this.preventAfkForwardKeyComboBox.TabIndex = 32;
+            this.preventAfkForwardKeyComboBox.SelectedItem = System.Windows.Forms.Keys.Z;
+            this.preventAfkForwardKeyComboBox.SelectedIndexChanged += new System.EventHandler(this.afkMovementKeyComboBox_SelectedIndexChanged);
+            //
+            // afkBackwardKeyLabel
+            //
+            this.afkBackwardKeyLabel.AutoSize = true;
+            this.afkBackwardKeyLabel.Location = new System.Drawing.Point(656, 99);
+            this.afkBackwardKeyLabel.Name = "afkBackwardKeyLabel";
+            this.afkBackwardKeyLabel.Size = new System.Drawing.Size(70, 17);
+            this.afkBackwardKeyLabel.TabIndex = 33;
+            this.afkBackwardKeyLabel.Text = "Backward:";
+            //
+            // preventAfkBackwardKeyComboBox
+            //
+            this.preventAfkBackwardKeyComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.preventAfkBackwardKeyComboBox.FormattingEnabled = true;
+            this.preventAfkBackwardKeyComboBox.Items.AddRange(new object[] {
+            System.Windows.Forms.Keys.W,
+            System.Windows.Forms.Keys.A,
+            System.Windows.Forms.Keys.S,
+            System.Windows.Forms.Keys.D,
+            System.Windows.Forms.Keys.Z,
+            System.Windows.Forms.Keys.Q,
+            System.Windows.Forms.Keys.Up,
+            System.Windows.Forms.Keys.Down});
+            this.preventAfkBackwardKeyComboBox.Location = new System.Drawing.Point(732, 95);
+            this.preventAfkBackwardKeyComboBox.Name = "preventAfkBackwardKeyComboBox";
+            this.preventAfkBackwardKeyComboBox.Size = new System.Drawing.Size(70, 24);
+            this.preventAfkBackwardKeyComboBox.TabIndex = 34;
+            this.preventAfkBackwardKeyComboBox.SelectedItem = System.Windows.Forms.Keys.S;
+            this.preventAfkBackwardKeyComboBox.SelectedIndexChanged += new System.EventHandler(this.afkMovementKeyComboBox_SelectedIndexChanged);
+            //
             // label2
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -410,18 +472,18 @@ namespace FishBot3._3._5a
             "Winter Squid",
             "World\'s Largest Mudfish",
             "Zangarian Sporefish"});
-            this.keptItems.Location = new System.Drawing.Point(519, 120);
+            this.keptItems.Location = new System.Drawing.Point(519, 145);
             this.keptItems.Name = "keptItems";
-            this.keptItems.Size = new System.Drawing.Size(170, 406);
+            this.keptItems.Size = new System.Drawing.Size(170, 381);
             this.keptItems.TabIndex = 0;
             this.keptItems.SelectedIndexChanged += new System.EventHandler(this.keptItems_SelectedIndexChanged);
             // 
             // dropItems
             // 
             this.dropItems.ItemHeight = 16;
-            this.dropItems.Location = new System.Drawing.Point(775, 120);
+            this.dropItems.Location = new System.Drawing.Point(775, 145);
             this.dropItems.Name = "dropItems";
-            this.dropItems.Size = new System.Drawing.Size(170, 406);
+            this.dropItems.Size = new System.Drawing.Size(170, 381);
             this.dropItems.TabIndex = 0;
             // 
             // keptToDropButton
@@ -444,7 +506,7 @@ namespace FishBot3._3._5a
             // 
             // keptItemsLabel
             // 
-            this.keptItemsLabel.Location = new System.Drawing.Point(560, 97);
+            this.keptItemsLabel.Location = new System.Drawing.Point(560, 122);
             this.keptItemsLabel.Name = "keptItemsLabel";
             this.keptItemsLabel.Size = new System.Drawing.Size(74, 17);
             this.keptItemsLabel.TabIndex = 3;
@@ -452,7 +514,7 @@ namespace FishBot3._3._5a
             // 
             // dropItemsLabel
             // 
-            this.dropItemsLabel.Location = new System.Drawing.Point(813, 97);
+            this.dropItemsLabel.Location = new System.Drawing.Point(813, 122);
             this.dropItemsLabel.Name = "dropItemsLabel";
             this.dropItemsLabel.Size = new System.Drawing.Size(100, 23);
             this.dropItemsLabel.TabIndex = 26;
@@ -471,6 +533,10 @@ namespace FishBot3._3._5a
             this.Controls.Add(this.pickLootBindLocationButton);
             this.Controls.Add(this.hotkeyHelpLabel);
             this.Controls.Add(this.preventAfkDisconnectCheckBox);
+            this.Controls.Add(this.afkForwardKeyLabel);
+            this.Controls.Add(this.preventAfkForwardKeyComboBox);
+            this.Controls.Add(this.afkBackwardKeyLabel);
+            this.Controls.Add(this.preventAfkBackwardKeyComboBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.cmdFish);
@@ -505,6 +571,10 @@ namespace FishBot3._3._5a
         private System.Windows.Forms.Button pickLootBindLocationButton;
         private System.Windows.Forms.Label hotkeyHelpLabel;
         private System.Windows.Forms.CheckBox preventAfkDisconnectCheckBox;
+        private System.Windows.Forms.Label afkForwardKeyLabel;
+        private System.Windows.Forms.ComboBox preventAfkForwardKeyComboBox;
+        private System.Windows.Forms.Label afkBackwardKeyLabel;
+        private System.Windows.Forms.ComboBox preventAfkBackwardKeyComboBox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.StatusStrip statusStrip1;

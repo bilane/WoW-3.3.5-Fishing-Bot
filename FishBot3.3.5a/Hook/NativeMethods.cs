@@ -15,9 +15,6 @@ namespace FishBot3._3._5a
 
         private const uint InputKeyboard = 1;
         private const uint KeyEventKeyUp = 0x0002;
-        private const ushort VirtualKeyW = 0x57;
-        private const ushort VirtualKeyS = 0x53;
-
         [StructLayout(LayoutKind.Sequential)]
         private struct Input
         {
@@ -59,26 +56,32 @@ namespace FishBot3._3._5a
         [DllImport("user32.dll", SetLastError = true)]
         private static extern uint SendInput(uint numberOfInputs, Input[] inputs, int size);
 
-        public static bool SendAfkPreventionMovement(out int errorCode)
+        public static bool SendAfkPreventionMovement(ushort forwardKey, ushort backwardKey, out int errorCode)
         {
-            if (!SendKeyboardInput(VirtualKeyW, 0, out errorCode))
+            if (forwardKey == backwardKey)
+            {
+                errorCode = 0;
+                return false;
+            }
+
+            if (!SendKeyboardInput(forwardKey, 0, out errorCode))
                 return false;
 
             Thread.Sleep(100);
-            if (!SendKeyboardInput(VirtualKeyW, KeyEventKeyUp, out errorCode))
+            if (!SendKeyboardInput(forwardKey, KeyEventKeyUp, out errorCode))
             {
-                SendKeyboardInput(VirtualKeyW, KeyEventKeyUp, out _);
+                SendKeyboardInput(forwardKey, KeyEventKeyUp, out _);
                 return false;
             }
 
             Thread.Sleep(100);
-            if (!SendKeyboardInput(VirtualKeyS, 0, out errorCode))
+            if (!SendKeyboardInput(backwardKey, 0, out errorCode))
                 return false;
 
             Thread.Sleep(100);
-            if (!SendKeyboardInput(VirtualKeyS, KeyEventKeyUp, out errorCode))
+            if (!SendKeyboardInput(backwardKey, KeyEventKeyUp, out errorCode))
             {
-                SendKeyboardInput(VirtualKeyS, KeyEventKeyUp, out _);
+                SendKeyboardInput(backwardKey, KeyEventKeyUp, out _);
                 return false;
             }
 

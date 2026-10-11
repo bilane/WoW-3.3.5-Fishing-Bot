@@ -331,10 +331,18 @@ namespace FishBot3._3._5a
                         else
                         {
                             nextAfkPreventionInput = DateTime.UtcNow.AddMinutes(AfkPreventionIntervalMinutes);
-                            if (!NativeMethods.SendAfkPreventionMovement(out var errorCode))
+                            if (preventAfkForwardKeyComboBox.SelectedItem == null ||
+                                preventAfkBackwardKeyComboBox.SelectedItem == null)
+                            {
+                                Log.Write("Choose both movement keys before enabling AFK prevention.", Color.Red);
+                            }
+                            else if (!NativeMethods.SendAfkPreventionMovement(
+                                         (ushort)(Keys)preventAfkForwardKeyComboBox.SelectedItem,
+                                         (ushort)(Keys)preventAfkBackwardKeyComboBox.SelectedItem,
+                                         out var errorCode))
                             {
                                 var error = errorCode == 0
-                                    ? "Windows did not accept the complete movement input."
+                                    ? "Choose different forward and backward keys."
                                     : new Win32Exception(errorCode).Message;
                                 Log.Write("Could not send AFK-prevention movement: " + error, Color.Red);
                             }
@@ -467,10 +475,31 @@ namespace FishBot3._3._5a
 
         private void preventAfkDisconnectCheckBox_CheckedChanged(object sender, EventArgs e)
         {
+            if (preventAfkDisconnectCheckBox.Checked &&
+                (Keys)preventAfkForwardKeyComboBox.SelectedItem == (Keys)preventAfkBackwardKeyComboBox.SelectedItem)
+            {
+                preventAfkDisconnectCheckBox.Checked = false;
+                Log.Write("Choose different keys for forward and backward movement.", Color.Red);
+                return;
+            }
+
             var message = preventAfkDisconnectCheckBox.Checked
-                ? "AFK prevention enabled: briefly moves forward and back every two minutes while WoW is in the foreground."
+                ? string.Format(
+                    "AFK prevention enabled: {0} then {1} every two minutes while WoW is in the foreground.",
+                    preventAfkForwardKeyComboBox.SelectedItem,
+                    preventAfkBackwardKeyComboBox.SelectedItem)
                 : "AFK prevention disabled.";
             Log.Write(message, Color.Black);
+        }
+
+        private void afkMovementKeyComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (preventAfkDisconnectCheckBox.Checked &&
+                (Keys)preventAfkForwardKeyComboBox.SelectedItem == (Keys)preventAfkBackwardKeyComboBox.SelectedItem)
+            {
+                preventAfkDisconnectCheckBox.Checked = false;
+                Log.Write("AFK prevention disabled: forward and backward keys must be different.", Color.Red);
+            }
         }
 
         private void keptItems_SelectedIndexChanged(object sender, EventArgs e)
