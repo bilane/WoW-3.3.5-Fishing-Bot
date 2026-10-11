@@ -21,11 +21,11 @@ nuget restore FishBot3.3.5a.sln
 msbuild FishBot3.3.5a.sln /m /p:Configuration=Release /p:Platform="Any CPU"
 ```
 
-For a fresh clone, use `git clone --recurse-submodules` instead of the separate submodule update command. The executable is produced at `FishBot3.3.5a\bin\Release\FishBot3.3.5a.exe`. Both configurations target x86. The application requests administrator privileges at launch and requires a 32-bit WoW 3.3.5a client; the client executable's memory layout must match the offsets in the source. A successful build does not verify compatibility with a particular game client.
+For a fresh clone, use `git clone --recurse-submodules` instead of the separate submodule update command. The executable is produced at `FishBot3.3.5a\bin\Release\warflex fishbot test.exe`. Both configurations target x86. The application requests administrator privileges at launch and requires a 32-bit WoW 3.3.5a client; the client executable's memory layout must match the offsets in the source. A successful build does not verify compatibility with a particular game client.
 
 ### Launch --
 
-After a successful Release build, run `FishBot3.3.5a\bin\Release\FishBot3.3.5a.exe` after starting WoW and logging into your character; Windows will display a UAC prompt because the application needs administrator privileges. Do not use the checked-in Debug executable as the updated build.
+After a successful Release build, run `FishBot3.3.5a\bin\Release\warflex fishbot test.exe` after starting WoW and logging into your character; Windows will display a UAC prompt because the application needs administrator privileges. Do not use the checked-in Debug executable as the updated build.
 
 The application intercepts memory created / used by the WoW.exe system process in order to interact directly with the game engine. In addition to requiring admin perms to accomplish, this means it does not hijack the use of your mouse, keyboard, or active window during normal fishing.
 

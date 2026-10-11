@@ -61,7 +61,7 @@ jobs:
         run: |
           msbuild FishBot3.3.5a.sln /m /p:Configuration=Release /p:Platform="Any CPU" /p:RestorePackagesConfig=true /verbosity:minimal
           if ($LASTEXITCODE -ne 0) { throw "MSBuild failed with exit code $LASTEXITCODE." }
-          $exe = "FishBot3.3.5a\bin\Release\FishBot3.3.5a.exe"
+          $exe = "FishBot3.3.5a\bin\Release\warflex fishbot test.exe"
           if (-not (Test-Path $exe)) { throw "Build finished without producing $exe" }
 
       - name: Package Release output
@@ -69,15 +69,15 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
           Copy-Item "FishBot3.3.5a\bin\Release\*" "artifacts\" -Recurse -Force
-          Compress-Archive -Path "artifacts\*" -DestinationPath "FishBot3.3.5a-Release-x86.zip" -Force
-          Copy-Item "FishBot3.3.5a\bin\Release\FishBot3.3.5a.exe" "FishBot3.3.5a.exe" -Force
+          Compress-Archive -Path "artifacts\*" -DestinationPath "warflex-fishbot-test-Release-x86.zip" -Force
+          Copy-Item "FishBot3.3.5a\bin\Release\warflex fishbot test.exe" "warflex fishbot test.exe" -Force
 
       - name: Upload downloadable build
         uses: actions/upload-artifact@v4
         with:
-          name: FishBot3.3.5a-Release-x86
+          name: warflex-fishbot-test-Release-x86
           path: |
-            FishBot3.3.5a-Release-x86.zip
-            FishBot3.3.5a.exe
+            warflex-fishbot-test-Release-x86.zip
+            warflex fishbot test.exe
           if-no-files-found: error
           retention-days: 14

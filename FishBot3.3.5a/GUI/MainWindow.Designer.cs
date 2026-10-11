@@ -485,7 +485,7 @@ namespace FishBot3._3._5a
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Fishbot - [WoW Version: 3.3.5a]";
+            this.Text = "warflex fishbot test";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
