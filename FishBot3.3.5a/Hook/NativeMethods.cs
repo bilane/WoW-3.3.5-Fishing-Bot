@@ -12,6 +12,76 @@ namespace FishBot3._3._5a
     {
         // credits to http://www.pinvoke.net/ for most of this.
 
+        private const uint InputKeyboard = 1;
+        private const uint KeyEventKeyUp = 0x0002;
+        private const ushort VirtualKeyF13 = 0x7C;
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct Input
+        {
+            public uint Type;
+            public InputUnion Data;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        private struct InputUnion
+        {
+            [FieldOffset(0)]
+            public KeyboardInput Keyboard;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct KeyboardInput
+        {
+            public ushort VirtualKey;
+            public ushort ScanCode;
+            public uint Flags;
+            public uint Time;
+            public UIntPtr ExtraInfo;
+        }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern uint SendInput(uint numberOfInputs, Input[] inputs, int size);
+
+        public static bool SendAfkPreventionInput(out int errorCode)
+        {
+            var inputs = new[]
+            {
+                CreateKeyboardInput(0),
+                CreateKeyboardInput(KeyEventKeyUp)
+            };
+            var inputSize = Marshal.SizeOf(typeof(Input));
+            var sent = SendInput((uint)inputs.Length, inputs, inputSize);
+
+            if (sent == inputs.Length)
+            {
+                errorCode = 0;
+                return true;
+            }
+
+            errorCode = Marshal.GetLastWin32Error();
+            if (sent > 0)
+                SendInput(1, new[] { CreateKeyboardInput(KeyEventKeyUp) }, inputSize);
+
+            return false;
+        }
+
+        private static Input CreateKeyboardInput(uint flags)
+        {
+            return new Input
+            {
+                Type = InputKeyboard,
+                Data = new InputUnion
+                {
+                    Keyboard = new KeyboardInput
+                    {
+                        VirtualKey = VirtualKeyF13,
+                        Flags = flags
+                    }
+                }
+            };
+        }
+
         #region ConnectionStates enum
 
         [Flags]

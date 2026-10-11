@@ -27,9 +27,11 @@ For a fresh clone, use `git clone --recurse-submodules` instead of the separate 
 
 After a successful Release build, run `FishBot3.3.5a\bin\Release\FishBot3.3.5a.exe` after starting WoW and logging into your character; Windows will display a UAC prompt because the application needs administrator privileges. Do not use the checked-in Debug executable as the updated build.
 
-The application intercepts memory created / used by the WoW.exe system process in order to interact directly with the game engine. In addition to requiring admin perms to accomplish, this means it does not hijack the use of your mouse, keyboard, or active window.
+The application intercepts memory created / used by the WoW.exe system process in order to interact directly with the game engine. In addition to requiring admin perms to accomplish, this means it does not hijack the use of your mouse, keyboard, or active window during normal fishing.
 
 During fishing, enable **Auto-accept bind-on-pickup** to accept only the client's `LOOT_BIND` confirmation. This permanently binds that item to the character. If a modified client uses a popup the automatic check cannot recognize, enable the option, click **Set fallback click location**, display the bind popup, move the pointer over its Accept button, and press **Ctrl+F8** to save the screen position. While fishing with WoW in the foreground, press **Ctrl+F9** when that popup is visible to click the saved position; this fallback is deliberately manual so it never blindly clicks unrelated UI. The cursor is restored after the click, and the location is remembered only until the bot closes.
+
+To keep the client from becoming idle while fishing, optionally enable **Prevent AFK**. It sends an F13 key press every two minutes only while the WoW window is in the foreground; make sure F13 is not bound to an in-game action. It does not change server settings and cannot prevent disconnects enforced by server-side timeout rules. Disable the option to send no periodic input.
 
 Global hotkeys are **Ctrl+F6** to start fishing, **Ctrl+F7** to stop, **Ctrl+F8** to capture the fallback position after selecting it, and **Ctrl+F9** to click that position. If another application has already registered a shortcut, the bot logs that it could not register it.
 

@@ -41,6 +41,7 @@ namespace FishBot3._3._5a
             this.autoAcceptLootBindCheckBox = new System.Windows.Forms.CheckBox();
             this.pickLootBindLocationButton = new System.Windows.Forms.Button();
             this.hotkeyHelpLabel = new System.Windows.Forms.Label();
+            this.preventAfkDisconnectCheckBox = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -136,6 +137,17 @@ namespace FishBot3._3._5a
             this.hotkeyHelpLabel.TabIndex = 29;
             this.hotkeyHelpLabel.Text = "Ctrl+F6 Start | Ctrl+F7 Stop | Ctrl+F8 Pick | Ctrl+F9 Click";
             this.hotkeyHelpLabel.UseMnemonic = false;
+            //
+            // preventAfkDisconnectCheckBox
+            //
+            this.preventAfkDisconnectCheckBox.AutoSize = true;
+            this.preventAfkDisconnectCheckBox.Location = new System.Drawing.Point(506, 70);
+            this.preventAfkDisconnectCheckBox.Name = "preventAfkDisconnectCheckBox";
+            this.preventAfkDisconnectCheckBox.Size = new System.Drawing.Size(440, 21);
+            this.preventAfkDisconnectCheckBox.TabIndex = 30;
+            this.preventAfkDisconnectCheckBox.Text = "Prevent AFK (F13 input every 2 min; WoW must be in foreground)";
+            this.preventAfkDisconnectCheckBox.UseVisualStyleBackColor = true;
+            this.preventAfkDisconnectCheckBox.CheckedChanged += new System.EventHandler(this.preventAfkDisconnectCheckBox_CheckedChanged);
             // 
             // label2
             // 
@@ -398,18 +410,18 @@ namespace FishBot3._3._5a
             "Winter Squid",
             "World\'s Largest Mudfish",
             "Zangarian Sporefish"});
-            this.keptItems.Location = new System.Drawing.Point(519, 96);
+            this.keptItems.Location = new System.Drawing.Point(519, 120);
             this.keptItems.Name = "keptItems";
-            this.keptItems.Size = new System.Drawing.Size(170, 430);
+            this.keptItems.Size = new System.Drawing.Size(170, 406);
             this.keptItems.TabIndex = 0;
             this.keptItems.SelectedIndexChanged += new System.EventHandler(this.keptItems_SelectedIndexChanged);
             // 
             // dropItems
             // 
             this.dropItems.ItemHeight = 16;
-            this.dropItems.Location = new System.Drawing.Point(775, 96);
+            this.dropItems.Location = new System.Drawing.Point(775, 120);
             this.dropItems.Name = "dropItems";
-            this.dropItems.Size = new System.Drawing.Size(170, 430);
+            this.dropItems.Size = new System.Drawing.Size(170, 406);
             this.dropItems.TabIndex = 0;
             // 
             // keptToDropButton
@@ -432,7 +444,7 @@ namespace FishBot3._3._5a
             // 
             // keptItemsLabel
             // 
-            this.keptItemsLabel.Location = new System.Drawing.Point(560, 73);
+            this.keptItemsLabel.Location = new System.Drawing.Point(560, 97);
             this.keptItemsLabel.Name = "keptItemsLabel";
             this.keptItemsLabel.Size = new System.Drawing.Size(74, 17);
             this.keptItemsLabel.TabIndex = 3;
@@ -440,7 +452,7 @@ namespace FishBot3._3._5a
             // 
             // dropItemsLabel
             // 
-            this.dropItemsLabel.Location = new System.Drawing.Point(813, 73);
+            this.dropItemsLabel.Location = new System.Drawing.Point(813, 97);
             this.dropItemsLabel.Name = "dropItemsLabel";
             this.dropItemsLabel.Size = new System.Drawing.Size(100, 23);
             this.dropItemsLabel.TabIndex = 26;
@@ -458,6 +470,7 @@ namespace FishBot3._3._5a
             this.Controls.Add(this.autoAcceptLootBindCheckBox);
             this.Controls.Add(this.pickLootBindLocationButton);
             this.Controls.Add(this.hotkeyHelpLabel);
+            this.Controls.Add(this.preventAfkDisconnectCheckBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.cmdFish);
@@ -491,6 +504,7 @@ namespace FishBot3._3._5a
         private System.Windows.Forms.CheckBox autoAcceptLootBindCheckBox;
         private System.Windows.Forms.Button pickLootBindLocationButton;
         private System.Windows.Forms.Label hotkeyHelpLabel;
+        private System.Windows.Forms.CheckBox preventAfkDisconnectCheckBox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.StatusStrip statusStrip1;

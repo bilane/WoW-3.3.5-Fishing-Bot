@@ -19,6 +19,7 @@ namespace FishBot3._3._5a
         private const int WmHotKey = 0x0312;
         private const uint ModControl = 0x0002;
         private const uint ModNoRepeat = 0x4000;
+        private const int AfkPreventionIntervalMinutes = 2;
         private const int StartFishingHotKeyId = 1;
         private const int StopFishingHotKeyId = 2;
         private const int CaptureLocationHotKeyId = 3;
@@ -291,12 +292,34 @@ namespace FishBot3._3._5a
             cmdFish.Enabled = false;
 
             Fish = !Fish;
+            var nextAfkPreventionInput = DateTime.UtcNow.AddMinutes(AfkPreventionIntervalMinutes);
 
             while (Fish)
             {
                 try
                 {
                     Application.DoEvents();
+
+                    if (!preventAfkDisconnectCheckBox.Checked)
+                    {
+                        nextAfkPreventionInput = DateTime.UtcNow.AddMinutes(AfkPreventionIntervalMinutes);
+                    }
+                    else if (DateTime.UtcNow >= nextAfkPreventionInput)
+                    {
+                        nextAfkPreventionInput = DateTime.UtcNow.AddMinutes(AfkPreventionIntervalMinutes);
+
+                        if (wowProcess == null || NativeMethods.GetForegroundWindow() != wowProcess.MainWindowHandle)
+                        {
+                            Log.Write("AFK-prevention input skipped because WoW is not the foreground window.", Color.DarkOrange);
+                        }
+                        else if (!NativeMethods.SendAfkPreventionInput(out var errorCode))
+                        {
+                            var error = errorCode == 0
+                                ? "Windows did not accept the complete key input."
+                                : new Win32Exception(errorCode).Message;
+                            Log.Write("Could not send AFK-prevention input: " + error, Color.Red);
+                        }
+                    }
 
                     if (autoAcceptLootBindCheckBox.Checked)
                         lua.AcceptPendingLootBinding();
@@ -419,6 +442,14 @@ namespace FishBot3._3._5a
 
             SystemSounds.Asterisk.Play();
             Fish = false;
+        }
+
+        private void preventAfkDisconnectCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            var message = preventAfkDisconnectCheckBox.Checked
+                ? "AFK prevention enabled: sends an unbound F13 key every two minutes while WoW is in the foreground."
+                : "AFK prevention disabled.";
+            Log.Write(message, Color.Black);
         }
 
         private void keptItems_SelectedIndexChanged(object sender, EventArgs e)
