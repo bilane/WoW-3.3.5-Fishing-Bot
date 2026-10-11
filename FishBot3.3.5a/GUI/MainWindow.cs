@@ -29,9 +29,8 @@ namespace FishBot3._3._5a
 
         private static Lua lua;
 
-        public static List<ulong> lastBobberGuid;
+        private readonly HashSet<ulong> clickedBobberGuids = new HashSet<ulong>();
         private int Caught;
-        private IntPtr FirstObj;
         private bool Fish;
         private Hook wowHook;
         private Process wowProcess;
@@ -124,11 +123,6 @@ namespace FishBot3._3._5a
                 Log.Write("Connected to process with ID = " + wowProcess.Id, Color.Black);
 
                 textBox1.Text = wowHook.Memory.ReadString(Offsets.PlayerName, Encoding.UTF8);
-
-                var s_curMgr = wowHook.Memory.Read<IntPtr>(IntPtr.Add(wowHook.Memory.Read<IntPtr>(Offsets.g_clientConnection), (int)Offsets.s_curMgrOffset));
-                var curObj = wowHook.Memory.Read<IntPtr>(IntPtr.Add(s_curMgr, (int)Offsets.FirstObjectOffset));
-
-                FirstObj = curObj;
 
                 lua.DoString("zoneData = GetZoneText()");
                 // Thread.Sleep(100);
@@ -286,12 +280,10 @@ namespace FishBot3._3._5a
                 return;
             }
 
-            lastBobberGuid = new List<ulong>();
-
             cmdStop.Enabled = true;
             cmdFish.Enabled = false;
 
-            Fish = !Fish;
+            Fish = true;
             var nextAfkPreventionInput = DateTime.UtcNow.AddMinutes(AfkPreventionIntervalMinutes);
 
             while (Fish)
@@ -366,22 +358,19 @@ namespace FishBot3._3._5a
                                            // 200 ms is a good length, most people play with under that latency
                     }
 
-                    var curObj = FirstObj;
+                    var clientConnection = wowHook.Memory.Read<IntPtr>(Offsets.g_clientConnection);
+                    var currentManager = wowHook.Memory.Read<IntPtr>(
+                        IntPtr.Add(clientConnection, (int)Offsets.s_curMgrOffset));
+                    var curObj = wowHook.Memory.Read<IntPtr>(
+                        IntPtr.Add(currentManager, (int)Offsets.FirstObjectOffset));
 
                     while (curObj.ToInt64() != 0 && (curObj.ToInt64() & 1) == 0)
                     {
                         var type = wowHook.Memory.Read<int>(curObj + 0x14);
                         var cGUID = wowHook.Memory.Read<ulong>(curObj + 0x30);
 
-                        if (lastBobberGuid.Count == 5) // Only keep the last 5 bobber GUID's (explained below * )
+                        if ((type == 5) && !clickedBobberGuids.Contains(cGUID))
                         {
-                            lastBobberGuid.RemoveAt(0);
-                            lastBobberGuid.TrimExcess();
-                        }
-
-                        if ((type == 5) && !lastBobberGuid.Contains(cGUID)) // 5 = Game Object, and ensure that we not finding a bobber we already clicked
-                        {
-                            // * wow likes leaving the old bobbers in the game world for a while
                             var objectName = wowHook.Memory.ReadString(
                                 wowHook.Memory.Read<IntPtr>(
                                     wowHook.Memory.Read<IntPtr>(curObj + 0x1A4) + 0x90
@@ -406,7 +395,7 @@ namespace FishBot3._3._5a
 
                                     lua.DoString("InteractUnit(\'mouseover\')");
 
-                                    lastBobberGuid.Add(cGUID);
+                                    clickedBobberGuids.Add(cGUID);
 
                                     Thread.Sleep(200);
 
