@@ -33,6 +33,8 @@ During fishing, enable **Auto-accept bind-on-pickup** to accept only the client'
 
 To keep the client from becoming idle while fishing, optionally enable **Prevent AFK**. It sends an F13 key press every two minutes only while the WoW window is in the foreground; make sure F13 is not bound to an in-game action. It does not change server settings and cannot prevent disconnects enforced by server-side timeout rules. Disable the option to send no periodic input.
 
+If a teleport or zone change triggers a loading screen while fishing, the bot pauses bobber scanning and resumes after WoW reports that the character has entered the world again.
+
 Global hotkeys are **Ctrl+F6** to start fishing, **Ctrl+F7** to stop, **Ctrl+F8** to capture the fallback position after selecting it, and **Ctrl+F9** to click that position. If another application has already registered a shortcut, the bot logs that it could not register it.
 
 ### Future Features to Implement

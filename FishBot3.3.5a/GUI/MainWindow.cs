@@ -119,6 +119,7 @@ namespace FishBot3._3._5a
                 if (!wowHook.Installed)
                     throw new InvalidOperationException("Could not install the game hook. Check the log and confirm the client is running as the same Windows user.");
                 lua = new Lua(wowHook);
+                lua.InitializeWorldStateMonitor();
 
                 Log.Write("Connected to process with ID = " + wowProcess.Id, Color.Black);
 
@@ -285,12 +286,32 @@ namespace FishBot3._3._5a
 
             Fish = true;
             var nextAfkPreventionInput = DateTime.UtcNow.AddMinutes(AfkPreventionIntervalMinutes);
+            var waitingForWorld = false;
 
             while (Fish)
             {
                 try
                 {
                     Application.DoEvents();
+
+                    if (!lua.IsPlayerInWorld())
+                    {
+                        if (!waitingForWorld)
+                        {
+                            Log.Write("Waiting for WoW to finish loading before resuming fishing...", Color.DarkOrange);
+                            clickedBobberGuids.Clear();
+                            waitingForWorld = true;
+                        }
+
+                        Thread.Sleep(500);
+                        continue;
+                    }
+
+                    if (waitingForWorld)
+                    {
+                        Log.Write("WoW has finished loading; resuming fishing.", Color.Green);
+                        waitingForWorld = false;
+                    }
 
                     if (!preventAfkDisconnectCheckBox.Checked)
                     {
@@ -409,6 +430,8 @@ namespace FishBot3._3._5a
                             break;
                         curObj = nextObj;
                     }
+
+                    Thread.Sleep(50);
                 }
                 catch (Exception ex)
                 {
@@ -420,6 +443,8 @@ namespace FishBot3._3._5a
                     {
                         Log.Write(ex.Message, Color.Red);
                     }
+
+                    Thread.Sleep(250);
                 }
             }
         }

@@ -98,5 +98,22 @@ namespace FishBot3._3._5a
                 "end " +
                 "end");
         }
+
+        public void InitializeWorldStateMonitor()
+        {
+            DoString(
+                "fishBotWorldReady = UnitExists('player') and '1' or '0'; " +
+                "if not fishBotWorldStateFrame then fishBotWorldStateFrame = CreateFrame('Frame') end; " +
+                "fishBotWorldStateFrame:RegisterEvent('PLAYER_LEAVING_WORLD'); " +
+                "fishBotWorldStateFrame:RegisterEvent('PLAYER_ENTERING_WORLD'); " +
+                "fishBotWorldStateFrame:SetScript('OnEvent', function(self, event) " +
+                "if event == 'PLAYER_LEAVING_WORLD' then fishBotWorldReady = '0' " +
+                "else fishBotWorldReady = UnitExists('player') and '1' or '0' end end)");
+        }
+
+        public bool IsPlayerInWorld()
+        {
+            return GetLocalizedText("fishBotWorldReady") == "1";
+        }
     }
 }
