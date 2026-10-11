@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
+using System.Threading;
 
 namespace FishBot3._3._5a
 {
@@ -14,7 +15,8 @@ namespace FishBot3._3._5a
 
         private const uint InputKeyboard = 1;
         private const uint KeyEventKeyUp = 0x0002;
-        private const ushort VirtualKeyF13 = 0x7C;
+        private const ushort VirtualKeyW = 0x57;
+        private const ushort VirtualKeyS = 0x53;
 
         [StructLayout(LayoutKind.Sequential)]
         private struct Input
@@ -27,7 +29,21 @@ namespace FishBot3._3._5a
         private struct InputUnion
         {
             [FieldOffset(0)]
+            public MouseInput Mouse;
+
+            [FieldOffset(0)]
             public KeyboardInput Keyboard;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MouseInput
+        {
+            public int X;
+            public int Y;
+            public uint Data;
+            public uint Flags;
+            public uint Time;
+            public UIntPtr ExtraInfo;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -43,43 +59,56 @@ namespace FishBot3._3._5a
         [DllImport("user32.dll", SetLastError = true)]
         private static extern uint SendInput(uint numberOfInputs, Input[] inputs, int size);
 
-        public static bool SendAfkPreventionInput(out int errorCode)
+        public static bool SendAfkPreventionMovement(out int errorCode)
         {
-            var inputs = new[]
-            {
-                CreateKeyboardInput(0),
-                CreateKeyboardInput(KeyEventKeyUp)
-            };
-            var inputSize = Marshal.SizeOf(typeof(Input));
-            var sent = SendInput((uint)inputs.Length, inputs, inputSize);
+            if (!SendKeyboardInput(VirtualKeyW, 0, out errorCode))
+                return false;
 
-            if (sent == inputs.Length)
+            Thread.Sleep(100);
+            if (!SendKeyboardInput(VirtualKeyW, KeyEventKeyUp, out errorCode))
             {
-                errorCode = 0;
-                return true;
+                SendKeyboardInput(VirtualKeyW, KeyEventKeyUp, out _);
+                return false;
             }
 
-            errorCode = Marshal.GetLastWin32Error();
-            if (sent > 0)
-                SendInput(1, new[] { CreateKeyboardInput(KeyEventKeyUp) }, inputSize);
+            Thread.Sleep(100);
+            if (!SendKeyboardInput(VirtualKeyS, 0, out errorCode))
+                return false;
 
-            return false;
+            Thread.Sleep(100);
+            if (!SendKeyboardInput(VirtualKeyS, KeyEventKeyUp, out errorCode))
+            {
+                SendKeyboardInput(VirtualKeyS, KeyEventKeyUp, out _);
+                return false;
+            }
+
+            errorCode = 0;
+            return true;
         }
 
-        private static Input CreateKeyboardInput(uint flags)
+        private static bool SendKeyboardInput(ushort virtualKey, uint flags, out int errorCode)
         {
-            return new Input
+            var input = new Input
             {
                 Type = InputKeyboard,
                 Data = new InputUnion
                 {
                     Keyboard = new KeyboardInput
                     {
-                        VirtualKey = VirtualKeyF13,
+                        VirtualKey = virtualKey,
                         Flags = flags
                     }
                 }
             };
+
+            if (SendInput(1, new[] { input }, Marshal.SizeOf(typeof(Input))) == 1)
+            {
+                errorCode = 0;
+                return true;
+            }
+
+            errorCode = Marshal.GetLastWin32Error();
+            return false;
         }
 
         #region ConnectionStates enum

@@ -319,18 +319,25 @@ namespace FishBot3._3._5a
                     }
                     else if (DateTime.UtcNow >= nextAfkPreventionInput)
                     {
-                        nextAfkPreventionInput = DateTime.UtcNow.AddMinutes(AfkPreventionIntervalMinutes);
-
                         if (wowProcess == null || NativeMethods.GetForegroundWindow() != wowProcess.MainWindowHandle)
                         {
-                            Log.Write("AFK-prevention input skipped because WoW is not the foreground window.", Color.DarkOrange);
+                            nextAfkPreventionInput = DateTime.UtcNow.AddMinutes(AfkPreventionIntervalMinutes);
+                            Log.Write("AFK-prevention movement skipped because WoW is not the foreground window.", Color.DarkOrange);
                         }
-                        else if (!NativeMethods.SendAfkPreventionInput(out var errorCode))
+                        else if (lua.IsPlayerCastingOrChanneling())
                         {
-                            var error = errorCode == 0
-                                ? "Windows did not accept the complete key input."
-                                : new Win32Exception(errorCode).Message;
-                            Log.Write("Could not send AFK-prevention input: " + error, Color.Red);
+                            nextAfkPreventionInput = DateTime.UtcNow.AddSeconds(5);
+                        }
+                        else
+                        {
+                            nextAfkPreventionInput = DateTime.UtcNow.AddMinutes(AfkPreventionIntervalMinutes);
+                            if (!NativeMethods.SendAfkPreventionMovement(out var errorCode))
+                            {
+                                var error = errorCode == 0
+                                    ? "Windows did not accept the complete movement input."
+                                    : new Win32Exception(errorCode).Message;
+                                Log.Write("Could not send AFK-prevention movement: " + error, Color.Red);
+                            }
                         }
                     }
 
@@ -461,7 +468,7 @@ namespace FishBot3._3._5a
         private void preventAfkDisconnectCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             var message = preventAfkDisconnectCheckBox.Checked
-                ? "AFK prevention enabled: sends an unbound F13 key every two minutes while WoW is in the foreground."
+                ? "AFK prevention enabled: briefly moves forward and back every two minutes while WoW is in the foreground."
                 : "AFK prevention disabled.";
             Log.Write(message, Color.Black);
         }

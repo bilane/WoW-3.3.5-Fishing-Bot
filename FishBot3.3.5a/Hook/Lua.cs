@@ -115,5 +115,12 @@ namespace FishBot3._3._5a
         {
             return GetLocalizedText("fishBotWorldReady") == "1";
         }
+
+        public bool IsPlayerCastingOrChanneling()
+        {
+            DoString(
+                "fishBotPlayerBusy = (UnitCastingInfo('player') or UnitChannelInfo('player')) and '1' or '0'");
+            return GetLocalizedText("fishBotPlayerBusy") == "1";
+        }
     }
 }

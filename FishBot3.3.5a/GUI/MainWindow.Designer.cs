@@ -145,7 +145,7 @@ namespace FishBot3._3._5a
             this.preventAfkDisconnectCheckBox.Name = "preventAfkDisconnectCheckBox";
             this.preventAfkDisconnectCheckBox.Size = new System.Drawing.Size(440, 21);
             this.preventAfkDisconnectCheckBox.TabIndex = 30;
-            this.preventAfkDisconnectCheckBox.Text = "Prevent AFK (F13 input every 2 min; WoW must be in foreground)";
+            this.preventAfkDisconnectCheckBox.Text = "Prevent AFK (brief W then S every 2 min; WoW must be in foreground)";
             this.preventAfkDisconnectCheckBox.UseVisualStyleBackColor = true;
             this.preventAfkDisconnectCheckBox.CheckedChanged += new System.EventHandler(this.preventAfkDisconnectCheckBox_CheckedChanged);
             // 
